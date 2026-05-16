@@ -105,11 +105,58 @@
       color:#777;
     }
 
+    .top-switch{
+      display:flex;
+      justify-content:center;
+      margin-bottom:14px;
+    }
+
+    .switch-btn{
+      background:#1565c0;
+      color:white;
+      padding:7px 12px;
+      border-radius:7px;
+      text-decoration:none;
+      font-size:12px;
+      font-weight:bold;
+      display:inline-block;
+    }
+
+    .switch-btn:hover{
+      background:#0d47a1;
+    }
+
+    .reset-btn{
+      margin-top:10px;
+      padding:7px 16px;
+      border:none;
+      border-radius:7px;
+      background:#e0e0e0;
+      cursor:pointer;
+      font-size:13px;
+    }
+
+    .reset-btn:hover{
+      background:#cfcfcf;
+    }
+
   </style>
 
 </head>
 
 <body>
+
+<div class="top-switch">
+
+  <a class="switch-btn"
+    href="https://sobcombo.github.io/s/"
+    target="_blank">
+
+    Switch to Combo Calc
+
+  </a>
+
+</div>
 
 <h2>SOB Reverse Combo Finder</h2>
 
@@ -129,6 +176,15 @@
     id="tpu"
     placeholder="Enter TPU Amount"
     oninput="reverseCalc()">
+
+  <br>
+
+  <button class="reset-btn"
+    onclick="resetFields()">
+
+    Reset
+
+  </button>
 
   <div class="result" id="result">
     Enter amount to search...
@@ -437,24 +493,24 @@ function reverseCalc(){
         p.matches.forEach(m => {
 
           let comboTPU =
-  (m.adults * c.adultTPU) +
-  (m.children * c.childTPU);
+            (m.adults * c.adultTPU) +
+            (m.children * c.childTPU);
 
-html += `
-  <div class="ac">
+          html += `
+            <div class="ac">
 
-    A: ${m.adults}
+              A: ${m.adults}
 
-    &nbsp; | &nbsp;
+              &nbsp; | &nbsp;
 
-    C: ${m.children}
+              C: ${m.children}
 
-    &nbsp;
+              &nbsp;
 
-    (TPU: ₹${comboTPU})
+              (TPU: ₹${comboTPU})
 
-  </div>
-`;
+            </div>
+          `;
 
         });
 
@@ -479,6 +535,19 @@ html += `
   }
 
   document.getElementById("result").innerHTML = html;
+
+}
+
+function resetFields(){
+
+  document.getElementById("oepl").value = "";
+
+  document.getElementById("paepl").value = "";
+
+  document.getElementById("tpu").value = "";
+
+  document.getElementById("result").innerHTML =
+    "Enter amount to search...";
 
 }
 
