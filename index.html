@@ -177,6 +177,10 @@
     placeholder="Enter TPU Amount"
     oninput="reverseCalc()">
 
+<input type="number"
+  id="totalAmount"
+  placeholder="Enter Total Combo Amount"
+  oninput="reverseCalc()">
   <br>
 
   <button class="reset-btn"
@@ -344,7 +348,15 @@ function reverseCalc(){
   let tpu =
     parseInt(document.getElementById("tpu").value) || 0;
 
-  if(oepl === 0 && paepl === 0 && tpu === 0){
+  let totalAmount =
+    parseInt(document.getElementById("totalAmount").value) || 0;
+
+  if(
+    oepl === 0 &&
+    paepl === 0 &&
+    tpu === 0 &&
+    totalAmount === 0
+  ){
 
     document.getElementById("result").innerHTML =
       "Enter amount to search...";
@@ -358,6 +370,16 @@ function reverseCalc(){
 
     let paxList = [];
 
+    let parts = c.name.split("/");
+
+    let adultPrice =
+      parseInt(parts[0]) || 0;
+
+    let childPrice =
+      c.na
+        ? 0
+        : (parseInt(parts[1]) || 0);
+
     for(let pax = 1; pax <= 50; pax++){
 
       let oeplMatch = true;
@@ -368,7 +390,8 @@ function reverseCalc(){
         if(c.oepl <= 0){
           oeplMatch = false;
         } else {
-          oeplMatch = (pax * c.oepl === oepl);
+          oeplMatch =
+            (pax * c.oepl === oepl);
         }
 
       }
@@ -378,7 +401,8 @@ function reverseCalc(){
         if(c.paepl <= 0){
           paeplMatch = false;
         } else {
-          paeplMatch = (pax * c.paepl === paepl);
+          paeplMatch =
+            (pax * c.paepl === paepl);
         }
 
       }
@@ -389,13 +413,21 @@ function reverseCalc(){
 
         if(c.na){
 
-          let calcTPU = pax * c.adultTPU;
+          let calcTPU =
+            pax * c.adultTPU;
 
-          if(tpu === 0 || calcTPU === tpu){
+          let calcTotal =
+            pax * adultPrice;
+
+          if(
+            (tpu === 0 || calcTPU === tpu) &&
+            (totalAmount === 0 || calcTotal === totalAmount)
+          ){
 
             matches.push({
               adults:pax,
-              children:0
+              children:0,
+              total:calcTotal
             });
 
           }
@@ -410,11 +442,19 @@ function reverseCalc(){
               (a * c.adultTPU) +
               (ch * c.childTPU);
 
-            if(tpu === 0 || calcTPU === tpu){
+            let calcTotal =
+              (a * adultPrice) +
+              (ch * childPrice);
+
+            if(
+              (tpu === 0 || calcTPU === tpu) &&
+              (totalAmount === 0 || calcTotal === totalAmount)
+            ){
 
               matches.push({
                 adults:a,
-                children:ch
+                children:ch,
+                total:calcTotal
               });
 
             }
@@ -452,8 +492,11 @@ function reverseCalc(){
 
       paxList.forEach(p => {
 
-        let oeplTotal = c.oepl * p.pax;
-        let paeplTotal = c.paepl * p.pax;
+        let oeplTotal =
+          c.oepl * p.pax;
+
+        let paeplTotal =
+          c.paepl * p.pax;
 
         html += `
           <div class="match">
@@ -505,9 +548,13 @@ function reverseCalc(){
 
               C: ${m.children}
 
-              &nbsp;
+              &nbsp; | &nbsp;
 
-              (TPU: ₹${comboTPU})
+              Total: ₹${m.total}
+
+              &nbsp; | &nbsp;
+
+              TPU: ₹${comboTPU}
 
             </div>
           `;
@@ -537,7 +584,6 @@ function reverseCalc(){
   document.getElementById("result").innerHTML = html;
 
 }
-
 function resetFields(){
 
   document.getElementById("oepl").value = "";
@@ -545,6 +591,8 @@ function resetFields(){
   document.getElementById("paepl").value = "";
 
   document.getElementById("tpu").value = "";
+
+  document.getElementById("totalAmount").value = "";
 
   document.getElementById("result").innerHTML =
     "Enter amount to search...";
