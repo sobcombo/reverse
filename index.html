@@ -139,6 +139,16 @@
     .reset-btn:hover{
       background:#cfcfcf;
     }
+    .input-row{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+}
+
+.input-row input{
+  width:50%;
+  margin:7px 0;
+}
 
   </style>
 
@@ -181,6 +191,21 @@
   id="totalAmount"
   placeholder="Enter Total Combo Amount"
   oninput="reverseCalc()">
+  
+<div class="input-row">
+
+  <input type="number"
+    id="adultCount"
+    placeholder="Adults"
+    oninput="reverseCalc()">
+
+  <input type="number"
+    id="childCount"
+    placeholder="Children"
+    oninput="reverseCalc()">
+
+</div>
+  
   <br>
 
   <button class="reset-btn"
@@ -350,7 +375,11 @@ function reverseCalc(){
 
   let totalAmount =
     parseInt(document.getElementById("totalAmount").value) || 0;
+let adultCount =
+  parseInt(document.getElementById("adultCount").value);
 
+let childCount =
+  parseInt(document.getElementById("childCount").value);
   if(
     oepl === 0 &&
     paepl === 0 &&
@@ -447,9 +476,11 @@ function reverseCalc(){
               (ch * childPrice);
 
             if(
-              (tpu === 0 || calcTPU === tpu) &&
-              (totalAmount === 0 || calcTotal === totalAmount)
-            ){
+  (tpu === 0 || calcTPU === tpu) &&
+  (totalAmount === 0 || calcTotal === totalAmount) &&
+  (isNaN(adultCount) || a === adultCount) &&
+  (isNaN(childCount) || ch === childCount)
+){
 
               matches.push({
                 adults:a,
@@ -596,7 +627,8 @@ function resetFields(){
 
   document.getElementById("result").innerHTML =
     "Enter amount to search...";
-
+document.getElementById("adultCount").value = "";
+document.getElementById("childCount").value = "";
 }
 
 </script>
