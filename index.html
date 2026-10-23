@@ -84,6 +84,10 @@ input{
       text-align:left;
     }
 
+    .empty-state{
+      text-align:center;
+    }
+
     .combo{
       background:#fafafa;
       border:1px solid #e2e2e2;
@@ -98,6 +102,57 @@ input{
       font-size:16px;
       line-height:1.4;
     }
+
+    .title-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap:8px;
+    }
+
+    .older-label{
+      flex-shrink:0;
+      font-size:11px;
+      font-weight:normal;
+      text-align:right;
+    }
+
+    .error-state{
+      padding:8px;
+      color:#c62828;
+      text-align:center;
+    }
+
+    .combo.newer .title{color:#1565c0}
+    .combo.newer .oepl-amount{color:#c62828}
+    .combo.newer .paepl-amount{color:#2e7d32}
+    .combo.newer .tpu-possibility{
+      display:inline;
+      padding:0;
+      border:0;
+      border-radius:0;
+      background:transparent;
+      color:#000;
+    }
+    .combo.newer .sub,
+    .combo.newer .pax,
+    .combo.newer .amounts,
+    .combo.newer .ac{color:#000}
+
+    .combo.older,
+    .combo.older .title,
+    .combo.older .sub,
+    .combo.older .match,
+    .combo.older .pax,
+    .combo.older .amounts,
+    .combo.older .ac{
+      color:#aaa;
+    }
+
+    .combo.older .ac{background:#f1f1f1}
+    .combo.older .oepl-amount,
+    .combo.older .paepl-amount,
+    .combo.older .tpu-possibility{color:#aaa}
 
     .sub{
       font-size:12px;
@@ -190,7 +245,7 @@ box-shadow:
 
 }
 
-.combo-btn{
+ .combo-btn{
 
 background:linear-gradient(
 135deg,
@@ -200,13 +255,13 @@ background:linear-gradient(
 
 color:white !important;
 
-padding:10px 18px;
+padding:6px 10px;
 
-border-radius:12px;
+border-radius:6px;
 
-font-size:13px;
+font-size:12px;
 font-weight:bold;
-letter-spacing:.3px;
+letter-spacing:0;
 
 text-decoration:none;
 
@@ -214,7 +269,7 @@ display:inline-block;
 
 box-shadow:
 4px 4px 0 #0b3a82,
-6px 8px 14px rgba(0,0,0,.20);
+6px 8px 14px rgba(0,0,0,.18);
 
 transition:all .15s ease;
 
@@ -267,13 +322,19 @@ box-shadow:
 }
     .input-row{
   display:flex;
-  gap:10px;
+  gap:8px;
   justify-content:center;
+  width:90%;
+  max-width:340px;
+  margin:auto;
 }
 
 .input-row input{
+  flex:1;
+  min-width:0;
   width:50%;
-  margin:7px 0;
+  max-width:none;
+  margin:8px 0;
 }
 
   </style>
@@ -297,39 +358,44 @@ Switch to Combo Calc
 <div class="container">
 <div class="box">
 
-  <input type="number"
-    id="oepl"
-    placeholder="Enter OEPL Amount"
-    oninput="reverseCalc()">
-
-  <input type="number"
-    id="paepl"
-    placeholder="Enter PAEPL Amount"
-    oninput="reverseCalc()">
-
-  <input type="number"
+  <input type="number" min="0" step="1"
     id="tpu"
     placeholder="Enter TPU Amount"
-    oninput="reverseCalc()">
+    oninput="sanitizeNumber(this);reverseCalc()">
 
-<input type="number"
+  <input type="number" min="0" step="1"
+    id="oepl"
+    placeholder="Enter OEPL Amount"
+    oninput="sanitizeNumber(this);reverseCalc()">
+
+  <input type="number" min="0" step="1"
+    id="paepl"
+    placeholder="Enter PAEPL Amount"
+    oninput="sanitizeNumber(this);reverseCalc()">
+
+<input type="number" min="0" step="1"
   id="totalAmount"
   placeholder="Enter Total Combo Amount"
-  oninput="reverseCalc()">
+  oninput="sanitizeNumber(this);reverseCalc()">
   
 <div class="input-row">
 
-  <input type="number"
+  <input type="number" min="0" max="100" step="1"
     id="adultCount"
     placeholder="Adults"
-    oninput="reverseCalc()">
+    oninput="sanitizeNumber(this,100);reverseCalc()">
 
-  <input type="number"
+  <input type="number" min="0" max="100" step="1"
     id="childCount"
     placeholder="Children"
-    oninput="reverseCalc()">
+    oninput="sanitizeNumber(this,100);reverseCalc()">
 
 </div>
+
+<input type="number" min="0" max="200" step="1"
+  id="totalGuests"
+  placeholder="Total Guests"
+  oninput="sanitizeNumber(this,200);reverseCalc()">
   
   <br>
 
@@ -341,7 +407,7 @@ Switch to Combo Calc
   </button>
 
   <div class="result" id="result">
-    Enter amount to search...
+    <div class="empty-state">Enter any amount to search!</div>
   </div>
 
 </div>
@@ -349,6 +415,142 @@ Switch to Combo Calc
 <script>
 
 const combos = [
+
+{
+name:"299/209 Explorer Combo",
+adultTPU:170,
+childTPU:80,
+oepl:40,
+paepl:89,
+na:false,
+newer:true
+},
+{
+name:"397/307 Eco Adventure Combo",
+adultTPU:170,
+childTPU:80,
+oepl:0,
+paepl:227,
+na:false,
+newer:true
+},
+{
+name:"398/308 Eco Fun Combo",
+adultTPU:170,
+childTPU:80,
+oepl:28,
+paepl:200,
+na:false,
+newer:true
+},
+{
+name:"425/335 Snow Adventure Combo",
+adultTPU:170,
+childTPU:80,
+oepl:255,
+paepl:0,
+na:false,
+newer:true
+},
+{
+name:"570/500 Aastha Combo",
+adultTPU:470,
+childTPU:400,
+oepl:0,
+paepl:100,
+na:false,
+newer:true
+},
+{
+name:"699/NA Adventure Combo",
+adultTPU:170,
+childTPU:170,
+oepl:0,
+paepl:529,
+na:true,
+newer:true
+},
+{
+name:"700/525 Namah Combo",
+adultTPU:650,
+childTPU:475,
+oepl:0,
+paepl:50,
+na:false,
+newer:true
+},
+{
+name:"775/585 Viewing Fun Combo",
+adultTPU:470,
+childTPU:280,
+oepl:155,
+paepl:150,
+na:false,
+newer:true
+},
+{
+name:"769/579 Symbolic Play Combo",
+adultTPU:470,
+childTPU:280,
+oepl:249,
+paepl:50,
+na:false,
+newer:true
+},
+{
+name:"889/799 Ultimate Play Combo",
+adultTPU:170,
+childTPU:80,
+oepl:199,
+paepl:520,
+na:false,
+newer:true
+},
+{
+name:"925/835 Delight Combo",
+adultTPU:470,
+childTPU:380,
+oepl:105,
+paepl:350,
+na:false,
+newer:true
+},
+{
+name:"969/779 Mini Blast Combo",
+adultTPU:670,
+childTPU:480,
+oepl:199,
+paepl:100,
+na:false,
+newer:true
+},
+{
+name:"1100/925 All in Fun Combo",
+adultTPU:450,
+childTPU:275,
+oepl:200,
+paepl:450,
+na:false,
+newer:true
+},
+{
+name:"1550/975 Divine Rush Combo",
+adultTPU:1450,
+childTPU:875,
+oepl:0,
+paepl:100,
+na:false,
+newer:true
+},
+{
+name:"4249/NA Ultimate Mega Combo",
+adultTPU:1500,
+childTPU:1500,
+oepl:449,
+paepl:2300,
+na:true,
+newer:true
+},
 
 {
 name:"390/300 TU Explorer Combo",
@@ -487,6 +689,18 @@ na:true
 
 ];
 
+function sanitizeNumber(input,maxValue=Number.MAX_SAFE_INTEGER){
+  const digits = input.value.replace(/\D/g,"");
+
+  if(!digits){
+    input.value = "";
+    return;
+  }
+
+  const value = Math.min(Number(digits),maxValue);
+  input.value = String(value);
+}
+
 function reverseCalc(){
 
   let oepl =
@@ -505,15 +719,33 @@ let adultCount =
 
 let childCount =
   parseInt(document.getElementById("childCount").value);
+
+let totalGuests =
+  parseInt(document.getElementById("totalGuests").value);
+
+  if(
+    !isNaN(adultCount) &&
+    !isNaN(childCount) &&
+    !isNaN(totalGuests) &&
+    adultCount + childCount !== totalGuests
+  ){
+    document.getElementById("result").innerHTML =
+      `<div class="error-state">Adults + children (${adultCount + childCount}) must match Total Guests (${totalGuests}).</div>`;
+    return;
+  }
+
   if(
     oepl === 0 &&
     paepl === 0 &&
     tpu === 0 &&
-    totalAmount === 0
+    totalAmount === 0 &&
+    isNaN(adultCount) &&
+    isNaN(childCount) &&
+    isNaN(totalGuests)
   ){
 
     document.getElementById("result").innerHTML =
-  '<div style="text-align:center;">Enter any amount to search!</div>';
+      '<div class="empty-state">Enter any amount to search!</div>';
 
     return;
   }
@@ -534,7 +766,11 @@ let childCount =
         ? 0
         : (parseInt(parts[1]) || 0);
 
-    for(let pax = 1; pax <= 50; pax++){
+    for(let pax = 1; pax <= 200; pax++){
+
+      if(!isNaN(totalGuests) && pax !== totalGuests){
+        continue;
+      }
 
       let oeplMatch = true;
       let paeplMatch = true;
@@ -574,8 +810,11 @@ let childCount =
             pax * adultPrice;
 
           if(
+            pax <= 100 &&
             (tpu === 0 || calcTPU === tpu) &&
-            (totalAmount === 0 || calcTotal === totalAmount)
+            (totalAmount === 0 || calcTotal === totalAmount) &&
+            (isNaN(adultCount) || adultCount === pax) &&
+            (isNaN(childCount) || childCount === 0)
           ){
 
             matches.push({
@@ -588,7 +827,7 @@ let childCount =
 
         } else {
 
-          for(let a = 0; a <= pax; a++){
+          for(let a = Math.max(0,pax - 100); a <= Math.min(100,pax); a++){
 
             let ch = pax - a;
 
@@ -635,10 +874,13 @@ let childCount =
     if(paxList.length > 0){
 
       html += `
-        <div class="combo">
+        <div class="combo ${c.newer ? "newer" : "older"}">
 
           <div class="title">
-            ${c.name}
+            <div class="title-row">
+              <span>${c.name}</span>
+              ${c.newer ? "" : '<span class="older-label">older combos April-Sept 2026</span>'}
+            </div>
 
             <div class="sub">
               Possibilities
@@ -668,23 +910,19 @@ let childCount =
 
               <br>
 
-              OEPL:
-              ₹${oeplTotal}
-
+              <span class="oepl-amount">OEPL: ₹${oeplTotal}
               ${c.oepl > 0
                 ? `(₹${c.oepl} × ${p.pax})`
                 : ""
-              }
+              }</span>
 
               <br>
 
-              PAEPL:
-              ₹${paeplTotal}
-
+              <span class="paepl-amount">PAEPL: ₹${paeplTotal}
               ${c.paepl > 0
                 ? `(₹${c.paepl} × ${p.pax})`
                 : ""
-              }
+              }</span>
 
             </div>
         `;
@@ -710,7 +948,7 @@ let childCount =
 
               &nbsp; | &nbsp;
 
-              TPU: ₹${comboTPU}
+              TPU: <span class="tpu-possibility">₹${comboTPU}</span>
 
             </div>
           `;
@@ -751,9 +989,10 @@ function resetFields(){
   document.getElementById("totalAmount").value = "";
 
   document.getElementById("result").innerHTML =
-  '<div style="text-align:center;">Enter any amount to search!</div>';
-document.getElementById("adultCount").value = "";
+  '<div class="empty-state">Enter any amount to search!</div>';
+  document.getElementById("adultCount").value = "";
 document.getElementById("childCount").value = "";
+document.getElementById("totalGuests").value = "";
 }
 
 </script>
